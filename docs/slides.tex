@@ -1,0 +1,168 @@
+\documentclass[10pt]{beamer}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\hypersetup{unicode=true}
+\usepackage{fontawesome}
+\usepackage{graphicx}
+\usepackage[english,russian]{babel}
+
+\usepackage[T1]{fontenc}
+\usepackage{fontawesome}
+\usepackage{PTSans} 
+\mode<presentation>
+{
+  \usetheme[progressbar=foot,numbering=fraction,background=light]{metropolis} 
+  \usecolortheme{default}
+  \usefonttheme{default}
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+} 
+
+\let\textttorig\texttt
+\renewcommand<>{\texttt}[1]{%
+  \only#2{\textttorig{#1}}%
+}
+
+\usepackage{minted}
+
+\usepackage{xcolor}
+\definecolor{codecolor}{HTML}{FFC300}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{most,listingsutf8,minted}
+
+\tcbset{tcbox width=auto,left=1mm,top=1mm,bottom=1mm,
+right=1mm,boxsep=1mm,middle=1pt}
+
+\newtcblisting{myr}[1]{colback=codecolor!5,colframe=codecolor!80!black,listing only, 
+minted options={numbers=left, style=tcblatex,fontsize=\tiny,breaklines,autogobble,linenos,numbersep=3mm},
+left=5mm,enhanced,
+title=#1, fonttitle=\bfseries,
+listing engine=minted,minted language=r}
+
+\definecolor{mygreen}{HTML}{37980D}
+\definecolor{myblue}{HTML}{0D089F}
+\definecolor{myred}{HTML}{98290D}
+
+\usepackage{listings}
+
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morecomment=[s]{<!--}{-->},
+  morestring=[s]{>}{<},
+  morekeywords={ref,xmlns,version,type,canonicalRef,metr,real,target}
+}
+
+\lstdefinestyle{myxml}{
+language=XML,
+showspaces=false,
+showtabs=false,
+basicstyle=\ttfamily,
+columns=fullflexible,
+breaklines=true,
+showstringspaces=false,
+breakatwhitespace=true,
+escapeinside={(*@}{@*)},
+basicstyle=\color{mygreen}\ttfamily,
+stringstyle=\color{myred},
+commentstyle=\color{myblue}\upshape,
+keywordstyle=\color{myblue}\bfseries,
+}
+
+
+% ------------------------------------------------------------------------------
+% The Document
+% ------------------------------------------------------------------------------
+\title{Разработка игрового приложения <<2048>>}
+\subtitle{Отчет о проектной работе по курсу <<Основы информатики и программирования>>}
+\author{Екатерина Федоровна Волкова}
+\date{11 июня 2021}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Введение}
+    Все, кто имеет дело с компьютером, так или иначе сталкивались с компьютерными
+играми, и подавляющее большинство может сходу назвать несколько игр, которые им
+особенно понравились. Те, кто уже совсем наигрался, почти наигрался или еще не наигрался, но в процессе общения с компьютером уже начал совмещать игры с чем-нибудь более полезным, возможно, хотели бы придумать какие-нибудь свои, не похожие ни на какие другие игры. Многое захватывает в таком творчестве. В данном проекте речь пойдет о создании игровой программы «2048», которая и будет являться объектом моей работы.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Цель и задачи проекта}
+    \begin{block}{Цель проекта:}
+        разработать игровое приложение, которое реализует игру «2048» на языке С++ и QML.
+  \end{block}
+  \begin{block}{Задачи проекта:}
+  \begin{itemize}
+    \item изучить различные вариации игры «2048» и на их примере разработать требования к собственному приложению;
+    \item разработать графический интерфейс пользователя;
+    \item реализовать приложение с использованием разработанных модулей и QtQuick;
+    \item получить навыки по составлению документации, описывающей работу программы;
+  \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{План разработки игры}
+    \begin{enumerate}
+         \item Разработка модуля для движения ячеек и их объединения.
+         \item Разработка модуля, отвечающего за создание новой игры(а также выбора размера игрового поля) или завершение начавшейся.
+         \item Разработка модуля, реализующего генерацию новых ячеек. 
+         \item Разработка модуля, характеризующего подсчет очков.
+         \item Разработка модуля дизайна поля и ячеек.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{brick.cpp}
+    \begin{itemize}
+         \item Содержит модуль, отвечающий за действия с ячейками, например, такие как значение нашего кирпичика(setvalue()) и присвоение цвета (setcolors());
+         \item А также получение индексов ячейки (setrow(); setcol()).
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{board.cpp}
+    \begin{itemize}
+        \item Состоит из модулей, отвечающих за движение ячеек (goUP(), goDown(), goLeft(), goRight()); генерацию новых (createNewBlock()) и их объединение moveBlocks(), (fusionBlocks());
+        \item Также реализован следующий модуль: создание новой игры --- newGame(), конец раунда --- endGame(), победа в игре --- winGame(). 
+        \item В дополнение ко всему был разработан модуль по подсчету очков (getscore(), getbestscore()) и установление размера поля (setdimension()).
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{main.qml}
+    main.qml является главным модулем графического интерфейса, который содержит:
+    \begin{enumerate}
+        \item кнопки начала новой игры и выбора размера сетки.
+        \item панель с текущим счетом и лучшим результатом.
+        \item игровое поле вместе с ячейками.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Реализация приложения}
+        \begin{columns}[T,onlytextwidth]
+                \begin{column}{0.44\textwidth}
+                        \begin{itemize}
+                                \item Таким образом, мною была разработана игра «2048» - увлекательное приложение, которое поможет вам скоротать время и развить свою логику. 
+                                \item Для этого были использованы языки <<С++>> и <<QML>>.
+                        \end{itemize}
+                \end{column}
+                \begin{column}{0.45\textwidth}
+                        \includegraphics[width=\textwidth]{filename.JPG}
+                \end{column}
+        \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Заключение}
+    Игровое приложение «2048» является логически завершенной игрой. Также возможны
+изменения и добавления некоторых моментов в геймплей, которые можно реализовать в
+дальнейшем. 
+    
+\end{frame}
+
+\begin{frame}[standout]
+    Спасибо за внимание !
+\end{frame}
+
+\end{document}
